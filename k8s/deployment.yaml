@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tap-session-app-deployment
+spec:
+  selector:
+    matchLabels:
+      app: tap-session-app
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: tap-session-app
+    spec:
+      containers:
+        - name: tap-session-app
+          image: csuvikg/tap-session-example:1.0
+          ports:
+            - name: app
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              port: app
+              path: /actuator/health/readiness
+          livenessProbe:
+            httpGet:
+              port: app
+              path: /actuator/health/liveness
+        - name: tap-session-app-redis
+          image: redis:6.2.6-alpine
+          ports:
+            - name: redis
+              containerPort: 6379
+          livenessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tap-session-app-service
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: tap-session-app
