@@ -1,5 +1,6 @@
 package com.infinitelambda.tapsessionexample;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,5 +15,10 @@ public class TestController {
         String username = request.getUserPrincipal().getName();
         String sessionId = request.getSession().getId();
         return Map.of("message", "Hello " + username + "! (Session: " + sessionId + ")");
+    }
+
+    @GetMapping("/admin")
+    public String adminOnly() {
+        return "Success";
     }
 }
